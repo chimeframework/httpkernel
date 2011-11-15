@@ -1,8 +1,9 @@
 package httpkernel
 
 import (
-	dispatcher "chime/components/eventdispatcher"
-	"chime/components/httpcontext"
+    "chime/components/httpcontext"
+    "net/http"
+    dispatcher "chime/components/eventdispatcher"
 )
 
 const (
@@ -17,6 +18,11 @@ const (
 type HttpKernel struct {
 	dispatcher *dispatcher.EventDispatcher
 	resolver   *Resolver
+}
+
+func (this *HttpKernel) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+    reqContext := httpcontext.NewRequest(request)
+    this.HandleMasterRequest(reqContext).Send(writer)
 }
 
 func (this *HttpKernel) HandleMasterRequest(req *httpcontext.Request) httpcontext.Responser {
