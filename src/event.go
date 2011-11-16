@@ -1,13 +1,15 @@
 package httpkernel
 
 import (
-	"reflect"
 	dispatcher "chime/components/eventdispatcher"
 	"chime/components/httpcontext"
+	"reflect"
 )
 
+/** START KERNEL EVENT **/
+
 type KernelEvent struct {
-	dispatcher.Event
+	*dispatcher.Event
 	kernel      *HttpKernel
 	request     *httpcontext.Request
 	requestType int
@@ -21,7 +23,7 @@ func (this *KernelEvent) GetKernel() *HttpKernel {
 	return this.kernel
 }
 
-func (this *KernelEvent) GetRequest() interface{} {
+func (this *KernelEvent) GetRequest() *httpcontext.Request {
 	return this.request
 }
 
@@ -29,8 +31,12 @@ func (this *KernelEvent) GetRequestType() int {
 	return this.requestType
 }
 
+/** END KERNEL EVENT **/
+
+/** START RESPONSE EVENT **/
+
 type ResponseEvent struct {
-	KernelEvent
+	*KernelEvent
 	response *httpcontext.Response
 }
 
@@ -55,8 +61,12 @@ func (this *ResponseEvent) HasResponse() bool {
 	return this.response != nil
 }
 
+/** END RESPONSE EVENT **/
+
+/** START FILTER RESPONSE EVENT **/
+
 type FilterResponseEvent struct {
-	KernelEvent
+	*KernelEvent
 	response *httpcontext.Response
 }
 
@@ -77,9 +87,13 @@ func (this *FilterResponseEvent) GetResponse() *httpcontext.Response {
 	return this.response
 }
 
+/** END FILTER RESPONSE EVENT **/
+
+/** START FILTER CONTROLLER EVENT **/
+
 // TODO: replace controller with a real controller
 type FilterControllerEvent struct {
-	KernelEvent
+	*KernelEvent
 	controller *reflect.Value
 }
 
@@ -100,11 +114,13 @@ func (this *FilterControllerEvent) SetController(controller *reflect.Value) {
 func (this *FilterControllerEvent) GetController() *reflect.Value {
 	return this.controller
 }
+/** END FILTER CONTROLLER EVENT **/
 
+/** START RESPONSE FOR CONTROLLER RESULT EVENT **/
 
 type ResponseForControllerResultEvent struct {
-    ResponseEvent
-    controllerResult interface{}
+	*ResponseEvent
+	controllerResult interface{}
 }
 
 func NewResponseForControllerResultEvent(ker *HttpKernel, req *httpcontext.Request, reqType int, controllerResult interface{}) *ResponseForControllerResultEvent {
@@ -115,3 +131,5 @@ func NewResponseForControllerResultEvent(ker *HttpKernel, req *httpcontext.Reque
 	this.controllerResult = controllerResult
 	return this
 }
+
+/** END RESPONSE FOR CONTROLLER RESULT EVENT **/

@@ -1,14 +1,9 @@
 package httpkernel
 
 import (
+    "fmt"
+    "reflect"
 	"chime/components/httpcontext"
-	_ "errors"
-	_ "fmt"
-	"reflect"
-	_ "strings"
-	// "chime/core/router"
-	// "chime/core/httpContext"
-	// "chime/core/utils"
 )
 
 type Resolver struct {
@@ -23,7 +18,11 @@ func NewResolver() *Resolver {
 	}
 }
 
-func (this *Resolver) GetController(req *httpcontext.Request) (controller *reflect.Value, method *reflect.Value, err error) {
+func (this *Resolver) GetController(request *httpcontext.Request) (controller *reflect.Value, method *reflect.Value, err error) {
+
+    if _, ok := request.GetAttribute(httpcontext.CONTROLLER_PARAM); !ok{
+        panic(fmt.Sprintf("%v is missing", httpcontext.CONTROLLER_PARAM))
+    }
 	return nil, nil, nil
 }
 
@@ -94,18 +93,18 @@ func (this *ClassResolver) GetCallable(route *router.Route) (controller *reflect
 
 */
 func (this *Resolver) GetArguments(req *httpcontext.Request, controller *reflect.Value) []reflect.Value {
-    params := make([]reflect.Value, 2)
-    params[0] = *controller
-    params[1] = reflect.ValueOf(req.GetAttributes())
-    return params
+	params := make([]reflect.Value, 2)
+	params[0] = *controller
+	params[1] = reflect.ValueOf(req.GetAttributes())
+	return params
 }
 
-func (this *Resolver) Call(method *reflect.Value, args []reflect.Value) (response interface{}, err error){
-    output := method.Call(args)
+func (this *Resolver) Call(method *reflect.Value, args []reflect.Value) (response interface{}, err error) {
+	output := method.Call(args)
 
-    if (len(output) > 1) && (!output[1].IsNil()){
-        return nil, output[1].Interface().(error)
-    }
+	if (len(output) > 1) && (!output[1].IsNil()) {
+		return nil, output[1].Interface().(error)
+	}
 
-    return output[0].Interface(), nil
+	return output[0].Interface(), nil
 }

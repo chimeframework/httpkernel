@@ -1,9 +1,9 @@
 package httpkernel
 
 import (
-    "chime/components/httpcontext"
-    "net/http"
-    dispatcher "chime/components/eventdispatcher"
+	dispatcher "chime/components/eventdispatcher"
+	"chime/components/httpcontext"
+	"net/http"
 )
 
 const (
@@ -21,8 +21,8 @@ type HttpKernel struct {
 }
 
 func (this *HttpKernel) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-    reqContext := httpcontext.NewRequest(request)
-    this.HandleMasterRequest(reqContext).Send(writer)
+	reqContext := httpcontext.NewRequest(request)
+	this.HandleMasterRequest(reqContext).Send(writer)
 }
 
 func (this *HttpKernel) HandleMasterRequest(req *httpcontext.Request) httpcontext.Responser {
@@ -43,38 +43,38 @@ func (this *HttpKernel) handleRequest(req *httpcontext.Request, reqType int) htt
 
 	controller, method, err := this.resolver.GetController(req)
 
-	if err != nil{
+	if err != nil {
 		panic("No controller found")
 	}
 
-    // raw controller
-    contEvent := NewFilterControllerEvent(this, req, reqType, controller)
-    this.dispatcher.Dispatch(KERNEL_EVENTS_CONTROLLER, contEvent)
-    controller = contEvent.GetController()
+	// raw controller
+	contEvent := NewFilterControllerEvent(this, req, reqType, controller)
+	this.dispatcher.Dispatch(KERNEL_EVENTS_CONTROLLER, contEvent)
+	controller = contEvent.GetController()
 
-    args := this.resolver.GetArguments(req, controller)
-    response, err := this.resolver.Call(method, args)
+	args := this.resolver.GetArguments(req, controller)
+	response, err := this.resolver.Call(method, args)
 
-    if err != nil{
-        panic(err.Error())
-    }
+	if err != nil {
+		panic(err.Error())
+	}
 
-    responser, ok := response.(httpcontext.Responser)
+	responser, ok := response.(httpcontext.Responser)
 
-    if !ok{
-        viewEvent := NewResponseForControllerResultEvent(this, req, reqType, responser)
-        this.dispatcher.Dispatch(KERNEL_EVENTS_VIEW, viewEvent)
+	if !ok {
+		viewEvent := NewResponseForControllerResultEvent(this, req, reqType, responser)
+		this.dispatcher.Dispatch(KERNEL_EVENTS_VIEW, viewEvent)
 
-        if event.HasResponse(){
-            response = event.GetResponse()
-        }
+		if event.HasResponse() {
+			response = event.GetResponse()
+		}
 
-        responser, ok = response.(httpcontext.Responser)
+		responser, ok = response.(httpcontext.Responser)
 
-        if !ok{
-            panic("Controller didn't return a response")
-        }
-    }
+		if !ok {
+			panic("Controller didn't return a response")
+		}
+	}
 	return responser
 }
 
