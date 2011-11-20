@@ -1,9 +1,9 @@
 package httpkernel
 
 import (
-    "fmt"
-    "reflect"
 	"chime/components/httpcontext"
+	"fmt"
+	"reflect"
 )
 
 type Resolver struct {
@@ -20,9 +20,9 @@ func NewResolver() *Resolver {
 
 func (this *Resolver) GetController(request *httpcontext.Request) (controller *reflect.Value, method *reflect.Value, err error) {
 
-    if _, ok := request.GetAttribute(httpcontext.CONTROLLER_PARAM); !ok{
-        panic(fmt.Sprintf("%v is missing", httpcontext.CONTROLLER_PARAM))
-    }
+	if _, ok := request.GetAttribute(httpcontext.CONTROLLER_PARAM); !ok {
+		panic(fmt.Sprintf("%v is missing", httpcontext.CONTROLLER_PARAM))
+	}
 	return nil, nil, nil
 }
 
