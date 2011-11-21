@@ -6,15 +6,26 @@ import (
 	"net/http"
 )
 
-const (
-	KERNEL_EVENTS_REQUEST    = "kernel.request"
-	KERNEL_EVENTS_VIEW       = "kernel.view"
-	KERNEL_EVENTS_RESPONSE   = "kernel.response"
-	KERNEL_EVENTS_CONTROLLER = "kernel.controller"
-	MASTER_REQUEST           = 1
-	SUB_REQUEST              = 2
-)
+type HttpKerneler interface{
+}
 
+type Kerneler interface{
+	HttpKerneler
+	RegisterBundles() []Bundler
+	Boot()
+	Shutdown()
+	GetBundles() []Bundler
+	GetBundle(string) []Bundler
+	GetFirstBundle(string) Bundler
+	GetName() string
+	GetEnviornment() string
+	IsDebug() bool
+	GetRootDir() string
+	GetStartTime() int
+	// TODO: implement locateResource(), GetCacheDir(), GetLogDir()
+}
+
+/// HttpKernel
 type HttpKernel struct {
 	dispatcher *dispatcher.EventDispatcher
 	resolver   *Resolver
